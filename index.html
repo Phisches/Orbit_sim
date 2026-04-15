@@ -12,8 +12,9 @@
             background-color: #0f172a;
             color: #f8fafc;
             margin: 0;
-            overflow: hidden; /* Prevent scrolling */
-            touch-action: none; /* Better touch handling */
+            overflow: hidden; 
+            touch-action: none; 
+            user-select: none; /* Verhindert Textmarkierung beim gedrückt Halten */
         }
         #simulation-container {
             position: relative;
@@ -49,44 +50,79 @@
             border: 2px solid #334155;
             padding: 1rem;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            max-width: 600px; /* Verbreitert für mehr Knöpfe */
+            max-width: 650px; 
         }
         .btn {
             display: block;
             width: 100%;
-            padding: 0.6rem;
+            padding: 0.5rem;
             border-radius: 0.5rem;
             font-weight: bold;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.1s;
             border: none;
             color: white;
-            font-size: 1rem;
+            font-size: 0.95rem;
             line-height: 1.2;
         }
         .btn:active { transform: scale(0.95); }
         
         /* Farben für die Knöpfe */
         .btn-blue { background-color: #3b82f6; box-shadow: 0 4px 0 #2563eb; }
-        .btn-blue:hover { background-color: #60a5fa; }
-        .btn-blue:active { box-shadow: 0 0 0 #2563eb; transform: translateY(4px); }
+        .btn-blue:active, .btn-blue.active-press { background-color: #60a5fa; box-shadow: 0 0 0 #2563eb; transform: translateY(4px); }
         
         .btn-green { background-color: #10b981; box-shadow: 0 4px 0 #059669; }
-        .btn-green:hover { background-color: #34d399; }
-        .btn-green:active { box-shadow: 0 0 0 #059669; transform: translateY(4px); }
+        .btn-green:active, .btn-green.active-press { background-color: #34d399; box-shadow: 0 0 0 #059669; transform: translateY(4px); }
 
         .btn-purple { background-color: #9333ea; box-shadow: 0 4px 0 #7e22ce; }
-        .btn-purple:hover { background-color: #a855f7; }
-        .btn-purple:active { box-shadow: 0 0 0 #7e22ce; transform: translateY(4px); }
+        .btn-purple:active, .btn-purple.active-press { background-color: #a855f7; box-shadow: 0 0 0 #7e22ce; transform: translateY(4px); }
 
         .btn-orange { background-color: #f97316; box-shadow: 0 4px 0 #c2410c; }
-        .btn-orange:hover { background-color: #fb923c; }
-        .btn-orange:active { box-shadow: 0 0 0 #c2410c; transform: translateY(4px); }
+        .btn-orange:active, .btn-orange.active-press { background-color: #fb923c; box-shadow: 0 0 0 #c2410c; transform: translateY(4px); }
 
-        .btn-red { background-color: #ef4444; box-shadow: 0 4px 0 #dc2626; }
-        .btn-red:hover { background-color: #f87171; }
-        .btn-red:active { box-shadow: 0 0 0 #dc2626; transform: translateY(4px); }
+        /* Hilfe Modal Styling */
+        #help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.9);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            backdrop-filter: blur(5px);
+        }
+        .help-content {
+            background-color: #1e293b;
+            border: 2px solid #3b82f6;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #e2e8f0;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+        .help-content h3 { color: #60a5fa; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .help-content p { margin-bottom: 1rem; line-height: 1.6; }
+        .help-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .close-help-btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        .close-help-btn:hover { background-color: #f87171; }
 
         #status-message {
             position: absolute;
@@ -125,65 +161,121 @@
     
     <div id="ui-layer">
         <div class="ui-panel title-panel">
-            <h1 class="text-2xl font-black text-blue-400 mb-2">🚀 Artemis Orbit Simulator</h1>
+            <h1 class="text-2xl font-black text-blue-400 mb-2">🚀 Artemis Mond-Mission</h1>
             <p class="text-sm text-slate-300">
-                Hallo Felix! Beobachte die Raumkapsel. Du kannst jetzt nicht nur <strong>Gas geben</strong>, 
-                sondern auch <strong>Bremsen</strong>, um auf der Erde zu landen!
+                Hallo Felix! Der Mond ist jetzt in Sicht. Du kannst den Autopiloten nutzen oder die 
+                <strong>Manuelle Steuerung</strong> verwenden, um die Kapsel zum Mond zu fliegen!
             </p>
         </div>
 
         <div id="status-message">Warte auf den richtigen Moment... ⏳</div>
 
         <button id="ui-toggle-btn" class="pointer-events-auto absolute bottom-4 right-4 z-50 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-full shadow-lg border border-slate-500 font-bold transition-all" onclick="toggleUI()">
-            🔽 Menü ausblenden
+            🔽 Menü
+        </button>
+
+        <!-- Hilfe Knopf -->
+        <button id="help-btn" class="pointer-events-auto absolute top-4 right-4 z-50 bg-blue-600 hover:bg-blue-500 text-white w-10 h-10 rounded-full shadow-lg border border-blue-400 font-bold flex items-center justify-center transition-all text-xl" onclick="toggleHelp()">
+            ?
         </button>
 
         <div id="control-panels" class="mt-auto flex flex-col md:flex-row gap-4 w-full items-end justify-between pointer-events-none transition-all duration-300 pb-12 md:pb-0">
             
             <div class="ui-panel pointer-events-auto flex-1 w-full">
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-lg font-bold text-slate-100">Missions-Kontrolle:</h2>
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-lg font-bold text-slate-100">Kontrollzentrum:</h2>
                     <button class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1 rounded shadow" onclick="resetSimulation()">
                         🔄 Neu starten
                     </button>
                 </div>
                 
-                <div class="mb-3 bg-slate-800/80 p-3 rounded-lg border border-slate-600">
-                    <label for="thrustPower" class="block text-sm font-bold text-slate-200 mb-2">
-                        ⚙️ Triebwerks-Stärke: <span id="thrustDisplay" class="text-blue-400">40%</span>
-                    </label>
-                    <input type="range" id="thrustPower" min="5" max="100" value="40" class="w-full accent-blue-500 cursor-pointer">
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <!-- Schubkraft -->
+                    <div class="bg-slate-800/80 p-2 rounded-lg border border-slate-600">
+                        <label for="thrustPower" class="block text-sm font-bold text-slate-200 mb-1 whitespace-nowrap">
+                            ⚙️ Schub: <span id="thrustDisplay" class="text-blue-400">40%</span>
+                        </label>
+                        <input type="range" id="thrustPower" min="5" max="100" value="40" class="w-full accent-blue-500 cursor-pointer">
+                    </div>
+                    
+                    <!-- Zeitraffer -->
+                    <div class="bg-slate-800/80 p-2 rounded-lg border border-slate-600">
+                        <label class="block text-sm font-bold text-slate-200 mb-1 whitespace-nowrap">
+                            ⏱️ Zeitraffer: <span id="timeDisplay" class="text-yellow-400">1x</span>
+                        </label>
+                        <div class="flex gap-1 h-[24px]">
+                            <button id="btn-warp-1" class="btn flex-1 py-0 text-xs bg-yellow-600 hover:bg-yellow-500" onclick="setTimeWarp(1)">1x</button>
+                            <button id="btn-warp-5" class="btn flex-1 py-0 text-xs bg-slate-600 hover:bg-slate-500" onclick="setTimeWarp(5)">5x</button>
+                            <button id="btn-warp-20" class="btn flex-1 py-0 text-xs bg-slate-600 hover:bg-slate-500" onclick="setTimeWarp(20)">20x</button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <!-- Manuelle Steuerung (Direkt) -->
+                    <div class="bg-slate-800/60 p-2 rounded border border-blue-500/50">
+                        <p class="text-xs text-blue-300 font-bold mb-1 text-center uppercase tracking-wider">🕹️ Direkt Steuern</p>
+                        <p class="text-[0.65rem] text-slate-400 text-center mb-1">(Knopf gedrückt halten!)</p>
+                        <button id="btn-manual-pro" class="btn btn-blue mb-2 touch-none">
+                            🚀 Gas geben
+                        </button>
+                        <button id="btn-manual-retro" class="btn btn-purple touch-none">
+                            🛑 Bremsen
+                        </button>
+                    </div>
+
                     <!-- Gruppe: Niedrigster Punkt -->
                     <div class="bg-slate-800/50 p-2 rounded border border-slate-700">
-                        <p class="text-xs text-slate-400 font-bold mb-2 text-center uppercase tracking-wider">Am niedrigsten Punkt</p>
+                        <p class="text-xs text-slate-400 font-bold mb-1 text-center uppercase tracking-wider">🤖 Am tiefsten Punkt</p>
+                        <p class="text-[0.65rem] text-slate-400 text-center mb-1">(Autopilot)</p>
                         <button class="btn btn-green mb-2" onclick="scheduleBurn('periapsis', 1)">
-                            🚀 Gas geben<br>
-                            <span class="text-xs font-normal opacity-80">(Zieht Orbit ins All)</span>
+                            🚀 Zünden
                         </button>
                         <button class="btn btn-orange" onclick="scheduleBurn('periapsis', -1)">
-                            🛑 Bremsen<br>
-                            <span class="text-xs font-normal opacity-80">(Zieht Orbit rein)</span>
+                            🛑 Bremsen
                         </button>
                     </div>
 
                     <!-- Gruppe: Höchster Punkt -->
                     <div class="bg-slate-800/50 p-2 rounded border border-slate-700">
-                        <p class="text-xs text-slate-400 font-bold mb-2 text-center uppercase tracking-wider">Am höchsten Punkt</p>
-                        <button class="btn btn-blue mb-2" onclick="scheduleBurn('apoapsis', 1)">
-                            🚀 Gas geben<br>
-                            <span class="text-xs font-normal opacity-80">(Hebt Orbit an)</span>
+                        <p class="text-xs text-slate-400 font-bold mb-1 text-center uppercase tracking-wider">🤖 Am höchsten Punkt</p>
+                        <p class="text-[0.65rem] text-slate-400 text-center mb-1">(Autopilot)</p>
+                        <button class="btn btn-blue mb-2 opacity-80" onclick="scheduleBurn('apoapsis', 1)">
+                            🚀 Zünden
                         </button>
-                        <button class="btn btn-purple" onclick="scheduleBurn('apoapsis', -1)">
-                            🛑 Bremsen<br>
-                            <span class="text-xs font-normal opacity-80 text-yellow-300">(Für die Landung!)</span>
+                        <button class="btn btn-purple opacity-80" onclick="scheduleBurn('apoapsis', -1)">
+                            🛑 Bremsen
                         </button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Hilfe Modal Container -->
+<div id="help-modal">
+    <div class="help-content">
+        <h2 class="text-2xl font-black text-white border-b border-slate-600 pb-2 mb-4">📖 Handbuch für Astronauten</h2>
+        
+        <p>Willkommen im Artemis Orbit Simulator! Hier könnt ihr lernen, wie man ein Raumschiff im Weltall steuert.</p>
+        
+        <h3>Die Grundregel der Orbitalmechanik</h3>
+        <p>Im Weltall lenkt man nicht wie mit einem Auto. Man verändert seine Bahn, indem man beschleunigt (Gas gibt) oder bremst.</p>
+        
+        <h3>Das wichtigste Manöver:</h3>
+        <ul>
+            <li><strong>Gas geben (🚀 Zünden):</strong> Vergrößert die Umlaufbahn (Orbit) auf der genau <em>gegenüberliegenden</em> Seite der Erde.</li>
+            <li><strong>Bremsen (🛑 Bremsen):</strong> Verkleinert die Umlaufbahn auf der <em>gegenüberliegenden</em> Seite.</li>
+        </ul>
+
+        <h3>Wie komme ich zum Mond?</h3>
+        <p>Um zum Mond zu fliegen, müsst ihr den Orbit so weit vergrößern, dass er die Mondbahn kreuzt. Am besten zündet ihr die Triebwerke (Gas geben), wenn ihr am <strong>tiefsten Punkt</strong> (nahe der Erde) seid. Wenn ihr es richtig macht und zur richtigen Zeit Gas gebt, fängt die Schwerkraft des Mondes das Raumschiff ein!</p>
+        
+        <h3>Wie lande ich wieder auf der Erde?</h3>
+        <p>Um zu landen, müsst ihr bremsen, bis die vorhergesagte Flugbahn (die gestrichelte Linie) die Erde berührt. Am effektivsten ist das Bremsen am <strong>höchsten Punkt</strong> der Umlaufbahn.</p>
+
+        <button class="close-help-btn" onclick="toggleHelp()">Verstanden, zurück zur Mission!</button>
     </div>
 </div>
 
@@ -193,8 +285,16 @@
     const statusMsg = document.getElementById('status-message');
 
     // --- Physics & Simulation Variables ---
+    // ERDE
     const G_M = 8000;
     const earthRadius = 40;
+    
+    // MOND
+    const G_M_moon = 150; // Schwächere Anziehungskraft als die Erde
+    const moonRadius = 12;
+    const moonOrbitRadius = 1200; // Entfernung von der Erde
+    const moonOmega = 0.0012; // Wie schnell der Mond um die Erde kreist
+    let moonAngle = 0;
     
     let scale = 1;
     let targetScale = 1;
@@ -205,19 +305,27 @@
     let predictedPath = [];
     let apoapsis = { x: 0, y: 0, dist: 0 };
     let periapsis = { x: 0, y: 0, dist: 0 };
-    let crashPoint = null; // Speichert den Ort der vorausberechneten Landung
+    let crashPoint = null; 
+    let crashBody = null; // 'earth' oder 'moon'
 
-    // Burn state
-    let scheduledBurnPoint = null; // 'apoapsis', 'periapsis', or null
-    let burnDirection = 1;         // 1 (Gas geben / Prograde), -1 (Bremsen / Retrograde)
-    let isBurning = false;
+    // Burn state (Autopilot)
+    let scheduledBurnPoint = null; 
+    let burnDirection = 1;         
+    let isAutoBurning = false;
     let burnTimer = 0;
-    const BURN_DURATION = 60; // Frames
+    const BURN_DURATION = 60; 
+    
+    // Burn state (Manual)
+    let isManualBurning = false;
+    let manualDirection = 0;
+
     const MAX_BURN_FORCE = 0.08;
     let currentThrustPower = 0.4;
     
     let isLanded = false;
     let previousDotProduct = 0;
+
+    let timeWarp = 1; // NEU: Zeitraffer-Geschwindigkeit
 
     // UI State
     let uiVisible = true;
@@ -228,17 +336,34 @@
         if (uiVisible) {
             panels.style.transform = 'translateY(0)';
             panels.style.opacity = '1';
-            btn.innerHTML = '🔽 Menü ausblenden';
+            btn.innerHTML = '🔽 Menü';
         } else {
             panels.style.transform = 'translateY(150%)'; 
             panels.style.opacity = '0';
-            btn.innerHTML = '⚙️ Menü anzeigen';
+            btn.innerHTML = '⚙️ Menü';
         }
+    }
+
+    function toggleHelp() {
+        const modal = document.getElementById('help-modal');
+        if (modal.style.display === 'flex') {
+            modal.style.display = 'none';
+        } else {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function setTimeWarp(speed) {
+        timeWarp = speed;
+        document.getElementById('timeDisplay').innerText = speed + 'x';
+        document.getElementById('btn-warp-1').className = `btn flex-1 py-0 text-xs ${speed === 1 ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-slate-600 hover:bg-slate-500'}`;
+        document.getElementById('btn-warp-5').className = `btn flex-1 py-0 text-xs ${speed === 5 ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-slate-600 hover:bg-slate-500'}`;
+        document.getElementById('btn-warp-20').className = `btn flex-1 py-0 text-xs ${speed === 20 ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-slate-600 hover:bg-slate-500'}`;
     }
 
     function resetSimulation() {
         const startDist = 120;
-        const startVelocity = Math.sqrt(G_M / startDist) * 1.15; // Elliptisch
+        const startVelocity = Math.sqrt(G_M / startDist) * 1.15; 
 
         ship = {
             x: 0,
@@ -248,14 +373,20 @@
             rotation: 0
         };
 
+        moonAngle = Math.PI * 0.25; // Mond startet oben rechts ("auf 2 Uhr")
+
         scheduledBurnPoint = null;
-        isBurning = false;
+        isAutoBurning = false;
+        isManualBurning = false;
+        manualDirection = 0;
         isLanded = false;
         crashPoint = null;
+        crashBody = null;
         statusMsg.style.display = 'none';
         statusMsg.style.animation = 'pulse 2s infinite';
         
-        if (!uiVisible) toggleUI(); // Menü wiederholen
+        setTimeWarp(1); // Zeit beim Neustart zurücksetzen
+        if (!uiVisible) toggleUI(); 
         updatePathPrediction();
     }
 
@@ -269,93 +400,165 @@
 
     // --- Interaction ---
     function scheduleBurn(point, direction) {
-        if (isBurning || isLanded) return;
+        if (isAutoBurning || isManualBurning || isLanded) return;
         
         scheduledBurnPoint = point;
         burnDirection = direction;
         
         let actionText = direction === 1 ? 'Gas geben' : 'Bremsen';
-        let pointText = point === 'periapsis' ? 'niedrigsten Punkt' : 'höchsten Punkt';
+        let pointText = point === 'periapsis' ? 'tiefsten Punkt' : 'höchsten Punkt';
         
         statusMsg.innerHTML = `Autopilot: Warte aufs ${actionText} am ${pointText}... ⏱️`;
         statusMsg.style.display = 'block';
         statusMsg.style.backgroundColor = direction === 1 ? 'rgba(245, 158, 11, 0.9)' : 'rgba(168, 85, 247, 0.9)'; 
 
-        // UI automatisch ausblenden für freie Sicht!
         if (uiVisible) toggleUI();
     }
 
-    function startBurn() {
+    function startAutoBurn() {
         scheduledBurnPoint = null;
-        isBurning = true;
+        isAutoBurning = true;
         burnTimer = BURN_DURATION;
+        setTimeWarp(1); // Bei Zündung sofort wieder auf normale Geschwindigkeit!
         
         if (burnDirection === 1) {
-            statusMsg.innerHTML = '🔥 Triebwerke gezündet! Orbit wird vergrößert...';
-            statusMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.9)'; // Rot
+            statusMsg.innerHTML = '🔥 Autopilot: Triebwerke zünden!';
+            statusMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.9)'; 
         } else {
-            statusMsg.innerHTML = '🛑 Brems-Triebwerke gezündet! Orbit wird verkleinert...';
-            statusMsg.style.backgroundColor = 'rgba(168, 85, 247, 0.9)'; // Lila
+            statusMsg.innerHTML = '🛑 Autopilot: Bremsen aktiviert!';
+            statusMsg.style.backgroundColor = 'rgba(168, 85, 247, 0.9)'; 
         }
+    }
+
+    // --- Manual Control Events ---
+    function setupManualControls() {
+        const btnPro = document.getElementById('btn-manual-pro');
+        const btnRetro = document.getElementById('btn-manual-retro');
+
+        const startManual = (dir, btn) => (e) => {
+            e.preventDefault(); // Verhindert Scrollen auf Handy
+            if (isLanded) return;
+            
+            // Bricht Autopilot ab, falls aktiv
+            scheduledBurnPoint = null; 
+            isAutoBurning = false; 
+            statusMsg.style.display = 'none';
+            
+            isManualBurning = true;
+            manualDirection = dir;
+            btn.classList.add('active-press');
+            setTimeWarp(1); // Bei manuellem Zünden sofort wieder auf normale Geschwindigkeit!
+        };
+
+        const stopManual = (btn) => (e) => {
+            e.preventDefault();
+            isManualBurning = false;
+            manualDirection = 0;
+            btn.classList.remove('active-press');
+            updatePathPrediction(); // Pfad nach manuellem Zünden aktualisieren
+        };
+
+        btnPro.addEventListener('mousedown', startManual(1, btnPro));
+        btnPro.addEventListener('touchstart', startManual(1, btnPro), {passive: false});
+        window.addEventListener('mouseup', stopManual(btnPro));
+        btnPro.addEventListener('touchend', stopManual(btnPro));
+        btnPro.addEventListener('touchcancel', stopManual(btnPro));
+
+        btnRetro.addEventListener('mousedown', startManual(-1, btnRetro));
+        btnRetro.addEventListener('touchstart', startManual(-1, btnRetro), {passive: false});
+        window.addEventListener('mouseup', stopManual(btnRetro));
+        btnRetro.addEventListener('touchend', stopManual(btnRetro));
+        btnRetro.addEventListener('touchcancel', stopManual(btnRetro));
     }
 
     // --- Physics Engine ---
-    function calculateAcceleration(x, y) {
-        const r2 = x*x + y*y;
-        const r = Math.sqrt(r2);
-        const a = -G_M / r2;
+    function getMoonPos(timeOffset = 0) {
+        const angle = moonAngle + moonOmega * timeOffset;
         return {
-            ax: a * (x / r),
-            ay: a * (y / r)
+            x: Math.cos(angle) * moonOrbitRadius,
+            y: Math.sin(angle) * moonOrbitRadius
         };
     }
 
-    function updatePhysics() {
-        if (isLanded) return; // Schiff bewegt sich nicht mehr
+    function calculateAcceleration(x, y, timeOffset = 0) {
+        // Erde Anziehung
+        const r2_e = x*x + y*y;
+        const r_e = Math.sqrt(r2_e);
+        const a_e = -G_M / r2_e;
+        let ax = a_e * (x / r_e);
+        let ay = a_e * (y / r_e);
 
-        // Lande-Erkennung (Kollision mit der Erde)
-        const currentDist = Math.sqrt(ship.x*ship.x + ship.y*ship.y);
-        if (currentDist <= earthRadius) {
-            isLanded = true;
-            isBurning = false;
-            ship.vx = 0;
-            ship.vy = 0;
-            
-            // Lande-Erfolgsmeldung
-            statusMsg.innerHTML = '🌍 Erfolgreich auf der Erde gelandet!<br><span style="font-size:0.8em;font-weight:normal;">Willkommen zu Hause, Astronaut Felix!</span>';
-            statusMsg.style.display = 'block';
-            statusMsg.style.backgroundColor = 'rgba(16, 185, 129, 0.95)'; // Grün
-            statusMsg.style.animation = 'none'; // Pulsieren stoppen
-            
-            if (!uiVisible) toggleUI();
+        // Mond Anziehung
+        const mPos = getMoonPos(timeOffset);
+        const dx_m = x - mPos.x;
+        const dy_m = y - mPos.y;
+        const r2_m = dx_m*dx_m + dy_m*dy_m;
+        
+        if (r2_m > 1) { // Verhindert Division durch Null
+            const r_m = Math.sqrt(r2_m);
+            const a_m = -G_M_moon / r2_m;
+            ax += a_m * (dx_m / r_m);
+            ay += a_m * (dy_m / r_m);
+        }
+
+        return { ax, ay };
+    }
+
+    function updatePhysics() {
+        if (isLanded) return; 
+
+        const dt = 1;
+        
+        // Mond bewegen
+        moonAngle += moonOmega * dt;
+        const mPos = getMoonPos();
+
+        // Lande-Erkennung Erde
+        const distEarth = Math.sqrt(ship.x*ship.x + ship.y*ship.y);
+        if (distEarth <= earthRadius) {
+            triggerLanding('earth', '🌍 Erfolgreich auf der Erde gelandet!<br><span style="font-size:0.8em;font-weight:normal;">Willkommen zu Hause, Felix!</span>');
             return;
         }
 
-        const dt = 1;
-        let acc1 = calculateAcceleration(ship.x, ship.y);
+        // Lande-Erkennung Mond
+        const distMoon = Math.sqrt((ship.x - mPos.x)**2 + (ship.y - mPos.y)**2);
+        if (distMoon <= moonRadius) {
+            triggerLanding('moon', '🌕 AUF DEM MOND GELANDET!<br><span style="font-size:0.8em;font-weight:normal;">Ein kleiner Schritt für Felix, ein großer Sprung für die Menschheit!</span>');
+            return;
+        }
+
+        let acc1 = calculateAcceleration(ship.x, ship.y, 0);
         
-        // Thrust anwenden (vorwärts oder rückwärts)
-        if (isBurning) {
+        // Finde heraus, ob und in welche Richtung wir gerade zünden
+        let activeBurnDirection = 0;
+        if (isAutoBurning) activeBurnDirection = burnDirection;
+        if (isManualBurning) activeBurnDirection = manualDirection;
+
+        const isCurrentlyBurning = activeBurnDirection !== 0;
+
+        if (isCurrentlyBurning) {
             const speed = Math.sqrt(ship.vx*ship.vx + ship.vy*ship.vy);
-            const appliedForce = MAX_BURN_FORCE * currentThrustPower * burnDirection;
+            const appliedForce = MAX_BURN_FORCE * currentThrustPower * activeBurnDirection;
             acc1.ax += (ship.vx / speed) * appliedForce;
             acc1.ay += (ship.vy / speed) * appliedForce;
             
-            burnTimer--;
-            if (burnTimer <= 0) {
-                isBurning = false;
-                statusMsg.style.display = 'none';
-                updatePathPrediction();
+            if (isAutoBurning) {
+                burnTimer--;
+                if (burnTimer <= 0) {
+                    isAutoBurning = false;
+                    statusMsg.style.display = 'none';
+                    updatePathPrediction();
+                }
             }
         }
 
         ship.x += ship.vx * dt + 0.5 * acc1.ax * dt * dt;
         ship.y += ship.vy * dt + 0.5 * acc1.ay * dt * dt;
 
-        let acc2 = calculateAcceleration(ship.x, ship.y);
-        if (isBurning) {
+        let acc2 = calculateAcceleration(ship.x, ship.y, dt);
+        if (isCurrentlyBurning) {
             const speed = Math.sqrt(ship.vx*ship.vx + ship.vy*ship.vy);
-            const appliedForce = MAX_BURN_FORCE * currentThrustPower * burnDirection;
+            const appliedForce = MAX_BURN_FORCE * currentThrustPower * activeBurnDirection;
             acc2.ax += (ship.vx / speed) * appliedForce;
             acc2.ay += (ship.vy / speed) * appliedForce;
         }
@@ -365,16 +568,31 @@
 
         ship.rotation = Math.atan2(ship.vy, ship.vx);
 
-        // Autopilot Check
+        // Autopilot Check (basiert auf Erde-Distanz)
         const dotProduct = ship.x * ship.vx + ship.y * ship.vy;
-        if (scheduledBurnPoint && !isBurning) {
+        if (scheduledBurnPoint && !isAutoBurning) {
             if (previousDotProduct < 0 && dotProduct >= 0) {
-                if (scheduledBurnPoint === 'periapsis') startBurn();
+                if (scheduledBurnPoint === 'periapsis') startAutoBurn();
             } else if (previousDotProduct > 0 && dotProduct <= 0) {
-                if (scheduledBurnPoint === 'apoapsis') startBurn();
+                if (scheduledBurnPoint === 'apoapsis') startAutoBurn();
             }
         }
         previousDotProduct = dotProduct;
+    }
+
+    function triggerLanding(body, msg) {
+        isLanded = true;
+        isAutoBurning = false;
+        isManualBurning = false;
+        ship.vx = 0;
+        ship.vy = 0;
+        
+        statusMsg.innerHTML = msg;
+        statusMsg.style.display = 'block';
+        statusMsg.style.backgroundColor = 'rgba(16, 185, 129, 0.95)'; 
+        statusMsg.style.animation = 'none'; 
+        
+        if (!uiVisible) toggleUI();
     }
 
     // --- Orbit Prediction ---
@@ -386,6 +604,7 @@
 
         predictedPath = [];
         crashPoint = null;
+        crashBody = null;
         let px = ship.x, py = ship.y;
         let pvx = ship.vx, pvy = ship.vy;
         
@@ -397,12 +616,14 @@
 
         const dt = 1.5;
         
-        for (let i = 0; i < 2000; i++) {
-            let acc1 = calculateAcceleration(px, py);
+        for (let i = 0; i < 2500; i++) { // Längere Vorhersage für den Mondflug
+            let timeOffset = i * dt;
+            let acc1 = calculateAcceleration(px, py, timeOffset);
+            
             let next_px = px + pvx * dt + 0.5 * acc1.ax * dt * dt;
             let next_py = py + pvy * dt + 0.5 * acc1.ay * dt * dt;
             
-            let acc2 = calculateAcceleration(next_px, next_py);
+            let acc2 = calculateAcceleration(next_px, next_py, timeOffset + dt);
             pvx += 0.5 * (acc1.ax + acc2.ax) * dt;
             pvy += 0.5 * (acc1.ay + acc2.ay) * dt;
             
@@ -411,24 +632,35 @@
 
             predictedPath.push({x: px, y: py});
 
-            let dist = Math.sqrt(px*px + py*py);
+            let distEarth = Math.sqrt(px*px + py*py);
             
-            // Vorhersage: Berühren wir die Erde?
-            if (dist <= earthRadius) {
+            // Kollision Erde?
+            if (distEarth <= earthRadius) {
                 crashPoint = {x: px, y: py};
-                break; // Vorhersage stoppt bei Landung
+                crashBody = 'earth';
+                break; 
             }
 
-            if (dist > maxD) { maxD = dist; apoapsis = {x: px, y: py, dist: dist}; }
-            if (dist < minD) { minD = dist; periapsis = {x: px, y: py, dist: dist}; }
+            // Kollision Mond?
+            let pMoon = getMoonPos(timeOffset);
+            let distMoonPredict = Math.sqrt((px - pMoon.x)**2 + (py - pMoon.y)**2);
+            if (distMoonPredict <= moonRadius + 5) { // Etwas größerer Zielbereich als Hilfe
+                crashPoint = {x: px, y: py};
+                crashBody = 'moon';
+                break;
+            }
 
-            if (i > 50) {
+            if (distEarth > maxD) { maxD = distEarth; apoapsis = {x: px, y: py, dist: distEarth}; }
+            if (distEarth < minD) { minD = distEarth; periapsis = {x: px, y: py, dist: distEarth}; }
+
+            // Loop Detection (Abbruch wenn Orbit geschlossen ist)
+            if (i > 100) {
                 let startDist = Math.sqrt((px - ship.x)**2 + (py - ship.y)**2);
                 if (startDist < Math.sqrt(pvx*pvx + pvy*pvy) * dt * 2) {
                     break; 
                 }
             }
-            if (dist > 3000) break;
+            if (distEarth > 4000) break; // Verlässt das System
         }
     }
 
@@ -442,104 +674,116 @@
         ctx.translate(cameraX, cameraY);
         ctx.scale(scale, scale);
 
-        // 1. Vorhersage-Linie
+        const currentMoonPos = getMoonPos(0);
+
+        // 1. Mond-Umlaufbahn zeichnen (Deutliche blaue Linie)
+        ctx.beginPath();
+        ctx.arc(0, 0, moonOrbitRadius, 0, Math.PI*2);
+        ctx.strokeStyle = 'rgba(59, 130, 246, 0.8)'; // Kräftigeres Blau
+        ctx.lineWidth = 6 / scale; // Dicker
+        ctx.setLineDash([30 / scale, 20 / scale]); // Größere Strichelung
+        ctx.stroke();
+        ctx.setLineDash([]); // Reset
+
+        // 2. Vorhersage-Linie
         if (predictedPath.length > 1) {
             ctx.beginPath();
             ctx.moveTo(ship.x, ship.y);
             for (let pt of predictedPath) {
                 ctx.lineTo(pt.x, pt.y);
             }
-            // Wenn eine Landung vorausgesagt ist, färbe das letzte Stück leicht rötlich
-            ctx.strokeStyle = crashPoint ? 'rgba(239, 68, 68, 0.6)' : 'rgba(255, 255, 255, 0.3)';
+            
+            if (crashBody === 'earth') ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)'; // Rot für Erde
+            else if (crashBody === 'moon') ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)'; // Grün für Mond
+            else ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            
             ctx.lineWidth = 2 / scale;
             ctx.setLineDash([10 / scale, 10 / scale]);
             ctx.stroke();
             ctx.setLineDash([]);
         }
 
-        // 2. Marker (Apoapsis / Periapsis / Landung)
+        // 3. Marker (Apoapsis / Periapsis / Landung)
         ctx.font = `${14/scale}px Nunito`;
         ctx.textAlign = 'center';
 
-        if (!crashPoint && apoapsis.dist > 0 && apoapsis.dist < 3000 && !isLanded) {
-            ctx.fillStyle = '#60a5fa';
+        // Marker nur anzeigen, wenn wir uns in Erdnähe befinden (macht nahe am Mond wenig Sinn)
+        if (!crashPoint && apoapsis.dist > 0 && apoapsis.dist < moonOrbitRadius * 0.8 && !isLanded) {
+            ctx.fillStyle = '#facc15'; // Gelb für den höchsten Punkt (Apoapsis) zur besseren Unterscheidung
             ctx.beginPath(); ctx.arc(apoapsis.x, apoapsis.y, 6 / scale, 0, Math.PI*2); ctx.fill();
-            ctx.fillText("Höchster Punkt", apoapsis.x, apoapsis.y - 12/scale);
+            //ctx.fillText("Höchster Punkt", apoapsis.x, apoapsis.y - 12/scale);
         }
 
-        if (!crashPoint && periapsis.dist > earthRadius && !isLanded) {
+        if (!crashPoint && periapsis.dist > earthRadius && periapsis.dist < moonOrbitRadius * 0.8 && !isLanded) {
             ctx.fillStyle = '#34d399';
             ctx.beginPath(); ctx.arc(periapsis.x, periapsis.y, 6 / scale, 0, Math.PI*2); ctx.fill();
-            ctx.fillText("Niedrigster Punkt", periapsis.x, periapsis.y + 20/scale);
         }
 
-        // Landepunkt markieren, wenn er vorausberechnet wurde
         if (crashPoint && !isLanded) {
-            ctx.fillStyle = '#ef4444'; // Rot
-            ctx.beginPath(); ctx.arc(crashPoint.x, crashPoint.y, 6 / scale, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = crashBody === 'moon' ? '#10b981' : '#ef4444'; 
+            ctx.beginPath(); ctx.arc(crashPoint.x, crashPoint.y, 8 / scale, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = 'white';
-            ctx.fillText("📍 Ziel: Landung!", crashPoint.x, crashPoint.y - 15/scale);
+            ctx.fillText("📍 Ziel", crashPoint.x, crashPoint.y - 15/scale);
         }
 
-        // 3. Erde zeichnen
+        // 4. Erde zeichnen
         const earthGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, earthRadius);
         earthGradient.addColorStop(0, '#3b82f6');
         earthGradient.addColorStop(0.8, '#1d4ed8');
         earthGradient.addColorStop(1, '#1e3a8a');
+        ctx.beginPath(); ctx.arc(0, 0, earthRadius, 0, Math.PI*2);
+        ctx.fillStyle = earthGradient; ctx.fill();
+        ctx.beginPath(); ctx.arc(0, 0, earthRadius + 5, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(59, 130, 246, 0.2)'; ctx.fill();
 
+        // 5. Mond zeichnen
         ctx.beginPath();
-        ctx.arc(0, 0, earthRadius, 0, Math.PI*2);
-        ctx.fillStyle = earthGradient;
+        ctx.arc(currentMoonPos.x, currentMoonPos.y, moonRadius, 0, Math.PI*2);
+        ctx.fillStyle = '#cbd5e1'; // Hellgrau
         ctx.fill();
+        // Mond Krater
+        ctx.fillStyle = '#94a3b8';
+        ctx.beginPath(); ctx.arc(currentMoonPos.x - 4, currentMoonPos.y - 3, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(currentMoonPos.x + 5, currentMoonPos.y + 2, 2, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(currentMoonPos.x - 1, currentMoonPos.y + 5, 2.5, 0, Math.PI*2); ctx.fill();
         
-        ctx.beginPath();
-        ctx.arc(0, 0, earthRadius + 5, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
-        ctx.fill();
+        // Mond Leuchten
+        ctx.beginPath(); ctx.arc(currentMoonPos.x, currentMoonPos.y, moonRadius + 8, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; ctx.fill();
 
-        // 4. Raumschiff zeichnen
+        // 6. Raumschiff zeichnen
         ctx.save();
         ctx.translate(ship.x, ship.y);
         
-        // Wenn gelandet, zeige das Schiff aufrecht auf der Oberfläche
-        if (isLanded) {
+        if (isLanded && crashBody === 'earth') {
             ctx.rotate(Math.atan2(ship.y, ship.x) + Math.PI/2);
+        } else if (isLanded && crashBody === 'moon') {
+            ctx.rotate(Math.atan2(ship.y - currentMoonPos.y, ship.x - currentMoonPos.x) + Math.PI/2);
         } else {
             ctx.rotate(ship.rotation);
         }
 
-        // Flammen zeichnen
-        if (isBurning) {
+        let activeBurnDirection = 0;
+        if (isAutoBurning) activeBurnDirection = burnDirection;
+        if (isManualBurning) activeBurnDirection = manualDirection;
+
+        if (activeBurnDirection !== 0) {
             ctx.fillStyle = Math.random() > 0.5 ? '#f59e0b' : '#ef4444';
             ctx.beginPath();
-            if (burnDirection === 1) {
-                // Hinten (Gas geben)
-                ctx.moveTo(-10, -5);
-                ctx.lineTo(-30 - Math.random()*15, 0);
-                ctx.lineTo(-10, 5);
+            if (activeBurnDirection === 1) {
+                ctx.moveTo(-10, -5); ctx.lineTo(-30 - Math.random()*15, 0); ctx.lineTo(-10, 5);
             } else {
-                // Vorne (Bremsen)
-                ctx.moveTo(15, -3);
-                ctx.lineTo(35 + Math.random()*15, 0);
-                ctx.lineTo(15, 3);
+                ctx.moveTo(15, -3); ctx.lineTo(35 + Math.random()*15, 0); ctx.lineTo(15, 3);
             }
-            ctx.closePath();
-            ctx.fill();
+            ctx.closePath(); ctx.fill();
         }
 
         // Schiffskörper
         ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.moveTo(15, 0);
-        ctx.lineTo(-10, 8);
-        ctx.lineTo(-10, -8);
-        ctx.closePath();
-        ctx.fill();
-        
+        ctx.beginPath(); ctx.moveTo(15, 0); ctx.lineTo(-10, 8); ctx.lineTo(-10, -8); ctx.closePath(); ctx.fill();
         // Solar-Panels
         ctx.fillStyle = '#1e293b';
-        ctx.fillRect(-5, 8, 8, 12);
-        ctx.fillRect(-5, -20, 8, 12);
+        ctx.fillRect(-5, 8, 8, 12); ctx.fillRect(-5, -20, 8, 12);
 
         ctx.restore();
         ctx.restore();
@@ -548,17 +792,28 @@
     // --- Main Game Loop ---
     let frameCount = 0;
     function loop() {
-        updatePhysics();
+        // Die Physik wird bei Zeitraffer einfach mehrmals pro Bild (Frame) berechnet.
+        // Das hält die Simulation stabil! Wenn timeWarp wieder 1 wird (z.B. bei Zündung),
+        // bricht die Schleife sofort ab.
+        for (let i = 0; i < timeWarp; i++) {
+            updatePhysics();
+        }
         
-        if (isBurning || frameCount % 30 === 0) {
+        let isCurrentlyBurning = isAutoBurning || isManualBurning;
+        if (isCurrentlyBurning || frameCount % 15 === 0) { // Häufigeres Update wegen dem Mond
             updatePathPrediction();
         }
 
-        // Auto-Zoom
+        // Auto-Zoom: Zeigt den Mond, wenn die Flugbahn weit genug nach außen geht
         let requiredRadius = 150;
         if (apoapsis && apoapsis.dist > 0) requiredRadius = Math.max(requiredRadius, apoapsis.dist);
         let shipDist = Math.sqrt(ship.x * ship.x + ship.y * ship.y);
         requiredRadius = Math.max(requiredRadius, shipDist);
+
+        // Zoom-Out Trigger: Wenn der Orbit größer als 300 wird, zoome ganz raus zum Mond!
+        if (requiredRadius > 300 && !isLanded) {
+            requiredRadius = Math.max(requiredRadius, moonOrbitRadius + 150);
+        }
 
         const padding = window.innerWidth < 768 ? 2.0 : 1.4; 
         const minDimension = Math.min(canvas.width, canvas.height);
@@ -566,11 +821,10 @@
 
         const maxAllowedScale = window.innerWidth < 768 ? 0.8 : 1.2;
         
-        // Wenn gelandet, ganz nah an die Erde ranzoomen
         if (isLanded) {
             targetScale = maxAllowedScale * 1.5;
         } else {
-            targetScale = Math.min(Math.max(calculatedScale, 0.02), maxAllowedScale);
+            targetScale = Math.min(Math.max(calculatedScale, 0.015), maxAllowedScale);
         }
 
         scale += (targetScale - scale) * 0.03;
@@ -586,6 +840,7 @@
         currentThrustPower = e.target.value / 100;
     });
 
+    setupManualControls();
     resize();
     resetSimulation();
     loop();
@@ -593,5 +848,3 @@
 </script>
 </body>
 </html>
-
-
